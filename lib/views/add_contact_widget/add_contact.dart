@@ -1,3 +1,4 @@
+import '../add_contact_widget/add_contact_view.dart';
 import 'package:flutter/material.dart';
 
 class AddContactPage extends StatelessWidget {
@@ -8,8 +9,11 @@ class AddContactPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text('Add Contact'),
-    );
+    return Scaffold(
+        appBar: AppBar(title: const Text('Add Contact')),
+        body: const Padding(
+          padding: EdgeInsets.all(12),
+          child: AddContactPage(),
+        ));
   }
 }
