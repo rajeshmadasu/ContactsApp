@@ -1,4 +1,7 @@
+import '../views/add_contact_widget/add_contact.dart';
 import 'package:flutter/material.dart';
+
+import '../views/contact_list.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -16,21 +19,17 @@ class AppDrawer extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 8.0),
                 children: <Widget>[
                   ListTile(
-                    leading: const Icon(Icons.contact_page),
-                    title: const Text('Contact list'),
-                    onTap: () {
-                      Navigator.pop(context);
-
-                      Navigator.pushNamed(context, "/contactlist");
-                    },
-                  ),
-                  ListTile(
                     leading: const Icon(Icons.favorite),
                     title: const Text('Favorite contacts'),
                     onTap: () {
                       Navigator.pop(context);
-
-                      Navigator.pushNamed(context, "/contactsfavlist");
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ContactList(
+                                    isFromFav: true,
+                                  )));
+                      // Navigator.pushNamed(context, "/contactsfavlist");
                     },
                   ),
                   ListTile(
@@ -38,8 +37,11 @@ class AppDrawer extends StatelessWidget {
                     title: const Text('Add New Contact'),
                     onTap: () {
                       Navigator.pop(context);
-
-                      Navigator.pushNamed(context, "/addcontact");
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddContactPage()));
+                      // Navigator.pushNamed(context, "/addcontact");
                     },
                   )
                 ],

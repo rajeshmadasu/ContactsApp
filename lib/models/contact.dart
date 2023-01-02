@@ -4,13 +4,15 @@ class Contact {
   String mobileNumber;
   String landlineNumber;
   String image;
+  int favourite;
 
   Contact(
       {required this.id,
       required this.name,
       required this.mobileNumber,
       required this.landlineNumber,
-      required this.image});
+      required this.image,
+      required this.favourite});
 
   factory Contact.fromDatabaseJson(Map<String, dynamic> data) => Contact(
         //This will be used to convert JSON objects that
@@ -21,16 +23,17 @@ class Contact {
         mobileNumber: data['mobile_number'],
         landlineNumber: data['landline_number'],
         image: data['image'],
+        favourite: data['favourite'],
       );
   // Convert a contact into a Map. The keys must correspond to the names of the
   // columns in the database.
   Map<String, dynamic> toDatabaseMap() {
     return {
-      'id': id,
       'name': name,
       'mobile_number': mobileNumber,
       'landline_number': landlineNumber,
       'image': image,
+      'favourite': favourite,
     };
   }
 
@@ -38,6 +41,6 @@ class Contact {
   // each contact when using the print statement.
   @override
   String toString() {
-    return 'Contact{id: $id, name: $name, mobile_number: $mobileNumber,landline_number:$landlineNumber,image:$image}';
+    return 'Contact{id: $id, name: $name, mobile_number: $mobileNumber,landline_number:$landlineNumber,image:$image,favourite:$favourite}';
   }
 }

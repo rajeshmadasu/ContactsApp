@@ -1,17 +1,18 @@
-import 'package:contactsapp/models/contact.dart';
 import '../dao/contact_dao.dart';
+import '../models/contact.dart';
 
 class ContactRepository {
   final contactDao = ContactDao();
 
-  Future getAllTodos({String? query}) => contactDao.getTodos(query: query);
+  Future getAllContacts({String? query}) =>
+      contactDao.getContacts(query: query);
+  Future getAllFavContacts() => contactDao.getFavContacts();
+  Future insertContact(Contact contact) => contactDao.createContact(contact);
 
-  Future insertTodo(Contact todo) => contactDao.createTodo(todo);
+  Future updateContact(Contact contact) => contactDao.updateContact(contact);
 
-  Future updateTodo(Contact todo) => contactDao.updateTodo(todo);
-
-  Future deleteTodoById(int id) => contactDao.deleteTodo(id);
+  Future deleteContactById(int id) => contactDao.deleteContact(id);
 
   //We are not going to use this in the demo
-  Future deleteAllTodos() => contactDao.deleteAllTodos();
+  Future deleteAllContacts() => contactDao.deleteAllContacts();
 }

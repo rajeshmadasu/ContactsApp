@@ -3,16 +3,21 @@
 import 'dart:ui';
 
 import 'package:contactsapp/database/contact_database.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import 'home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  DartPluginRegistrant.ensureInitialized(); //<----FIX THE PROBLEM
+  DartPluginRegistrant.ensureInitialized();
 
-  runApp(MyHomePage(
-    title: "Contacts",
-    databaseProvider: DatabaseProvider(),
-  ));
+  runApp(MaterialApp(
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primaryColor: Colors.lightBlue[800],
+      ),
+      home: MyHomePage(
+        title: "Contacts",
+        databaseProvider: DatabaseProvider(),
+      )));
 }

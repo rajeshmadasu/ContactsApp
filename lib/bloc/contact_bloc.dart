@@ -1,45 +1,96 @@
 import 'dart:async';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../models/contact.dart';
 import '../repository/contact_repository.dart';
 
-class ContactBloc {
+part 'contact_event.dart';
+part 'contact_state.dart';
+
+class ContactBloc extends Bloc<ContactEvent, ContactState> {
   //Get instance of the Repository
-  final _todoRepository = ContactRepository();
+  final _contactRepository = ContactRepository();
 
   //Stream controller is the 'Admin' that manages
   //the state of our stream of data like adding
   //new data, change the state of the stream
   //and broadcast it to observers/subscribers
-  final _todoController = StreamController<List<Contact>>.broadcast();
+  final _contactController = StreamController<List<Contact>>.broadcast();
 
-  get todos => _todoController.stream;
+  get allContacts => _contactController.stream;
 
-  ContactBloc() {
-    getContacts();
+  ContactBloc() : super(const ContactState()) {
+    on<GetContacts>(getContacts);
+    on<GetFavContacts>(getFavContacts);
+    on<UpdateContact>(updateContact);
   }
 
-  getContacts({String? query}) async {
+  getFavContacts(GetFavContacts event, Emitter<ContactState> emit) async {
+    emit(state.copyWith(status: ContactStatus.loading));
+    try {
+      final contacts = await _contactRepository.getAllFavContacts();
+      emit(
+        state.copyWith(
+          status: ContactStatus.success,
+          contacts: contacts,
+        ),
+      );
+    } catch (error, stacktrace) {
+      emit(state.copyWith(status: ContactStatus.error));
+    }
+  }
+
+  getContacts(GetContacts event, Emitter<ContactState> emit) async {
     //sink is a way of adding data reactively to the stream
     //by registering a new event
-    _todoController.sink.add(await _todoRepository.getAllTodos(query: query));
+    emit(state.copyWith(status: ContactStatus.loading));
+    try {
+      final contacts = await _contactRepository.getAllContacts();
+      emit(
+        state.copyWith(
+          status: ContactStatus.success,
+          contacts: contacts,
+        ),
+      );
+    } catch (error, stacktrace) {
+      emit(state.copyWith(status: ContactStatus.error));
+    }
+    //  _contactController.sink.add(await _contactRepository.getAllContacts());
   }
 
-  addTodo(Contact todo) async {
-    await _todoRepository.insertTodo(todo);
-    getContacts();
+//  getFavContacts({String? query}) async {
+//    _contactController.sink.add(await _contactRepository.getAllFavContacts());
+//  }
+
+  addContact(Contact contact) async {
+    await _contactRepository.insertContact(contact);
   }
 
-  updateTodo(Contact todo) async {
-    await _todoRepository.updateTodo(todo);
-    getContacts();
+  updateContact(UpdateContact event, Emitter<ContactState> emit) async {
+    emit(state.copyWith(status: ContactStatus.loading));
+    Contact updateContact = event.contact;
+    updateContact.favourite = event.contact.favourite == 1 ? 0 : 1;
+    await _contactRepository.updateContact(updateContact);
+
+    try {
+      final contacts = await _contactRepository.getAllContacts();
+      emit(
+        state.copyWith(
+          status: ContactStatus.success,
+          contacts: contacts,
+        ),
+      );
+    } catch (error) {
+      emit(state.copyWith(status: ContactStatus.error));
+    }
   }
 
-  deleteTodoById(int id) async {
-    _todoRepository.deleteTodoById(id);
-    getContacts();
+  deleteContactById(int id) async {
+    _contactRepository.deleteContactById(id);
   }
 
   dispose() {
-    _todoController.close();
+    _contactController.close();
   }
 }

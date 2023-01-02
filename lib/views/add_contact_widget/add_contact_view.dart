@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import '../../models/contact.dart';
+import '../add_contact_widget/bloc/add_edit_contact_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddContactView extends StatefulWidget {
@@ -11,7 +14,7 @@ class AddContactView extends StatefulWidget {
 }
 
 class _AddContactViewState extends State<AddContactView> {
-  late XFile imageFile;
+  XFile? imageFile = null;
   final ImagePicker _picker = ImagePicker();
   final TextEditingController name = TextEditingController();
   final TextEditingController mobileNumber = TextEditingController();
@@ -22,53 +25,82 @@ class _AddContactViewState extends State<AddContactView> {
     imageFile = (value)!;
   }
 
+  void _onSubmitSave() {
+    //int id = (const Uuid().v4().toString()) as int;
+    context.read<AddEditContactBloc>().add(SaveContact(Contact(
+        id: 0,
+        name: name.text.toString(),
+        mobileNumber: mobileNumber.text.toString(),
+        landlineNumber: landlineNumber.text.toString(),
+        image: imageFile!.path.toString(),
+        favourite: 0)));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(10),
-      child: Align(
-        alignment: const Alignment(0, -2 / 3),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-                child: imageFile == null
-                    ? Container(
-                        alignment: Alignment.center,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            IconButton(
-                              color: Colors.greenAccent,
-                              onPressed: () {
-                                _onImageButtonPressed(ImageSource.gallery,
-                                    context: context);
-                              },
-                              icon: Icon(Icons.add_a_photo),
+    return BlocListener<AddEditContactBloc, AddEditContactState>(
+        listener: (context, state) {
+          if (state.status.isError) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(content: Text('Failed to add contact')),
+              );
+          } else if (state.status.isSuccess) {
+            Navigator.pop(context);
+          }
+        },
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(10),
+          child: Align(
+            alignment: const Alignment(0, -2 / 3),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                    child: imageFile == null
+                        ? Container(
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  margin: EdgeInsets.all(10),
+                                  padding: EdgeInsets.all(8),
+                                  child: IconButton(
+                                    color: Colors.blue,
+                                    onPressed: () {
+                                      _onImageButtonPressed(ImageSource.camera,
+                                          context: context);
+                                    },
+                                    icon: const Icon(Icons.add_a_photo),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      )
-                    : Container(
-                        height: 120,
-                        width: 120,
-                        child: Image.file(
-                          File(imageFile.path),
-                          fit: BoxFit.cover,
-                        ),
-                      )),
-            const Padding(padding: EdgeInsets.all(12)),
-            _NameInput(),
-            const Padding(padding: EdgeInsets.all(12)),
-            _MobileNumberInput(),
-            const Padding(padding: EdgeInsets.all(12)),
-            _LandlineNumberInput(),
-            const Padding(padding: EdgeInsets.all(12)),
-            _LoginButton(),
-          ],
-        ),
-      ),
-    );
+                          )
+                        : Container(
+                            height: 120,
+                            width: 120,
+                            child: Image.file(
+                              File(imageFile!.path),
+                              fit: BoxFit.cover,
+                            ),
+                          )),
+                const Padding(padding: EdgeInsets.all(8)),
+                _NameInput(name),
+                const Padding(padding: EdgeInsets.all(8)),
+                _MobileNumberInput(mobileNumber),
+                const Padding(padding: EdgeInsets.all(8)),
+                _LandlineNumberInput(landlineNumber),
+                const Padding(padding: EdgeInsets.all(8)),
+                Container(
+                  child: _SaveButton(voidCallback: _onSubmitSave),
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 
   Future<void> _onImageButtonPressed(ImageSource source,
@@ -99,7 +131,7 @@ class _AddContactViewState extends State<AddContactView> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Pick Image from Gallery/Camera'),
+            title: const Text('Pick Image from Camera'),
             actions: <Widget>[
               TextButton(
                 child: const Text('CANCEL'),
@@ -112,7 +144,7 @@ class _AddContactViewState extends State<AddContactView> {
                   onPressed: () {
                     const double width = 1800;
                     const double height = 1800;
-                    const int quality = 1080;
+                    const int quality = 100;
                     onPick(width, height, quality);
                     Navigator.of(context).pop();
                   }),
@@ -136,14 +168,15 @@ _getFromGallery() async {
 }
 
 class _NameInput extends StatelessWidget {
+  TextEditingController nameEditingParameter;
+
+  _NameInput(this.nameEditingParameter);
+
   @override
   Widget build(BuildContext context) {
     return TextField(
-      key: const Key('loginForm_usernameInput_textField'),
-      onChanged: (username) => {},
-      //context.read<LoginBloc>().add(LoginUsernameChanged(username)),
+      controller: nameEditingParameter,
       decoration: InputDecoration(
-        border: OutlineInputBorder(),
         labelText: 'Name',
       ),
     );
@@ -151,45 +184,63 @@ class _NameInput extends StatelessWidget {
 }
 
 class _MobileNumberInput extends StatelessWidget {
+  TextEditingController mobileNoEditingParameter;
+  _MobileNumberInput(this.mobileNoEditingParameter);
+
   @override
   Widget build(BuildContext context) {
     return TextField(
-      key: const Key('loginForm_usernameInput_textField'),
-      onChanged: (mobilenumber) => {},
+      controller: mobileNoEditingParameter,
       //context.read<LoginBloc>().add(LoginUsernameChanged(username)),
       decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'Name',
+        labelText: 'Mobile Number',
       ),
     );
   }
 }
 
 class _LandlineNumberInput extends StatelessWidget {
+  TextEditingController landlineEditingParameter;
+  _LandlineNumberInput(this.landlineEditingParameter);
+
   @override
   Widget build(BuildContext context) {
     return TextField(
-      key: const Key('loginForm_usernameInput_textField'),
-      onChanged: (landlinenumber) => {},
-      //context.read<LoginBloc>().add(LoginUsernameChanged(username)),
+      controller: landlineEditingParameter,
       decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'Name',
+        labelText: 'Landline Number',
       ),
     );
   }
 }
 
-class _LoginButton extends StatelessWidget {
+class _SaveButton extends StatelessWidget {
+  final VoidCallback voidCallback;
+
+  _SaveButton({required this.voidCallback});
+
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      key: const Key('loginForm_continue_raisedButton'),
-      onPressed: null,
-      child: const Text(
-        'Save',
-        style: TextStyle(color: Colors.white, fontSize: 25),
-      ),
+    return BlocBuilder<AddEditContactBloc, AddEditContactState>(
+      buildWhen: (previous, current) => previous.status != current.status,
+      builder: (context, state) {
+        return state.status.isSubmissionInProgress
+            ? const CircularProgressIndicator()
+            : Container(
+                height: 50,
+                width: 250,
+                decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(20)),
+                child: TextButton(
+                  onPressed: voidCallback,
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(color: Colors.white, fontSize: 25),
+                  ),
+                ),
+              );
+      },
     );
   }
 }
