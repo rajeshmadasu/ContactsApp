@@ -1,43 +1,83 @@
+// ignore_for_file: must_be_immutable
+
 import 'dart:io';
 
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/tap_bounce_container.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:flutter/material.dart';
 import '../../models/contact.dart';
 import '../add_contact_widget/bloc/add_edit_contact_bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddContactView extends StatefulWidget {
-  const AddContactView({super.key});
+  final Contact? contact;
+  bool isFavEnabled = false;
+
+  AddContactView(this.contact, this.isFavEnabled, {super.key});
 
   @override
   State<AddContactView> createState() => _AddContactViewState();
 }
 
 class _AddContactViewState extends State<AddContactView> {
-  XFile? imageFile = null;
+  XFile? imageFile;
   final ImagePicker _picker = ImagePicker();
   final TextEditingController name = TextEditingController();
   final TextEditingController mobileNumber = TextEditingController();
   final TextEditingController landlineNumber = TextEditingController();
-  dynamic _pickImageError;
 
   void _setImageFileListFromFile(XFile? value) {
     imageFile = (value)!;
   }
 
+  bool editContact = false;
+  int favourite = 0;
+  int contactId = 0;
   void _onSubmitSave() {
-    //int id = (const Uuid().v4().toString()) as int;
-    context.read<AddEditContactBloc>().add(SaveContact(Contact(
-        id: 0,
-        name: name.text.toString(),
-        mobileNumber: mobileNumber.text.toString(),
-        landlineNumber: landlineNumber.text.toString(),
-        image: imageFile!.path.toString(),
-        favourite: 0)));
+    if (name.text.isNotEmpty &&
+        mobileNumber.text.isNotEmpty &&
+        landlineNumber.text.isNotEmpty) {
+      context.read<AddEditContactBloc>().add(editContact
+          ? updateContact(Contact(
+              id: contactId,
+              name: name.text.toString(),
+              mobileNumber: mobileNumber.text.toString(),
+              landlineNumber: landlineNumber.text.toString(),
+              image: imageFile!.path.toString(),
+              favourite: favourite))
+          : SaveContact(Contact(
+              id: 0, // this is ignored while mapping to database model
+              name: name.text.toString(),
+              mobileNumber: mobileNumber.text.toString(),
+              landlineNumber: landlineNumber.text.toString(),
+              image: imageFile != null ? imageFile!.path.toString() : "",
+              favourite: favourite)));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.contact != null) {
+      Contact? contact = widget.contact;
+      name.text = contact!.name.toString();
+      mobileNumber.text = contact.mobileNumber.toString();
+      landlineNumber.text = contact.landlineNumber.toString();
+      setState(() {
+        favourite = contact.favourite;
+        _setImageFileListFromFile(XFile(contact.image.toString()));
+        editContact = true;
+        contactId = contact.id;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    favourite = widget.isFavEnabled ? 1 : 0;
+
     return BlocListener<AddEditContactBloc, AddEditContactState>(
         listener: (context, state) {
           if (state.status.isError) {
@@ -47,64 +87,78 @@ class _AddContactViewState extends State<AddContactView> {
                 const SnackBar(content: Text('Failed to add contact')),
               );
           } else if (state.status.isSuccess) {
-            Navigator.pop(context);
+            Navigator.pop(context, true);
           }
         },
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(10),
-          child: Align(
-            alignment: const Alignment(0, -2 / 3),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                    child: imageFile == null
-                        ? Container(
-                            alignment: Alignment.center,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  margin: EdgeInsets.all(10),
-                                  padding: EdgeInsets.all(8),
-                                  child: IconButton(
-                                    color: Colors.blue,
-                                    onPressed: () {
-                                      _onImageButtonPressed(ImageSource.camera,
-                                          context: context);
-                                    },
-                                    icon: const Icon(Icons.add_a_photo),
+        child: Column(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(10),
+              child: Align(
+                alignment: const Alignment(0, -2 / 3),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        _onImageButtonPressed(ImageSource.camera,
+                            context: context);
+                      },
+                      child: Container(
+                          child: imageFile == null
+                              ? Container(
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Container(
+                                        margin: const EdgeInsets.all(10),
+                                        padding: const EdgeInsets.all(8),
+                                        child: GestureDetector(
+                                          // Image tapped
+                                          child: Image.asset(
+                                            'assets/images/add_image.png',
+                                            fit: BoxFit
+                                                .cover, // Fixes border issues
+                                            width: 110.0,
+                                            height: 110.0,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : Container(
-                            height: 120,
-                            width: 120,
-                            child: Image.file(
-                              File(imageFile!.path),
-                              fit: BoxFit.cover,
-                            ),
-                          )),
-                const Padding(padding: EdgeInsets.all(8)),
-                _NameInput(name),
-                const Padding(padding: EdgeInsets.all(8)),
-                _MobileNumberInput(mobileNumber),
-                const Padding(padding: EdgeInsets.all(8)),
-                _LandlineNumberInput(landlineNumber),
-                const Padding(padding: EdgeInsets.all(8)),
-                Container(
-                  child: _SaveButton(voidCallback: _onSubmitSave),
+                                )
+                              : Container(
+                                  height: 120,
+                                  width: 120,
+                                  child: Image.file(
+                                    File(imageFile!.path),
+                                    fit: BoxFit.cover,
+                                  ),
+                                )),
+                    ),
+                    const Padding(padding: EdgeInsets.all(8)),
+                    _NameInput(name),
+                    const Padding(padding: EdgeInsets.all(8)),
+                    _MobileNumberInput(mobileNumber),
+                    const Padding(padding: EdgeInsets.all(8)),
+                    _LandlineNumberInput(landlineNumber),
+                    const Padding(padding: EdgeInsets.all(8)),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+            Expanded(
+                child: Align(
+              alignment: FractionalOffset.bottomCenter,
+              child: _SaveButton(voidCallback: _onSubmitSave),
+            )),
+          ],
         ));
   }
 
   Future<void> _onImageButtonPressed(ImageSource source,
-      {BuildContext? context, bool isMultiImage = false}) async {
+      {BuildContext? context}) async {
     _displayPickImageDialog(context!,
         (double? maxWidth, double? maxHeight, int? quality) async {
       try {
@@ -118,9 +172,7 @@ class _AddContactViewState extends State<AddContactView> {
           _setImageFileListFromFile(pickedFile);
         });
       } catch (e) {
-        setState(() {
-          _pickImageError = e;
-        });
+        setState(() {});
       }
     });
   }
@@ -157,16 +209,6 @@ class _AddContactViewState extends State<AddContactView> {
 typedef OnPickImageCallback = void Function(
     double? maxWidth, double? maxHeight, int? quality);
 
-/// Get from gallery
-_getFromGallery() async {
-  PickedFile? pickedFile = await ImagePicker().getImage(
-    source: ImageSource.gallery,
-    maxWidth: 1800,
-    maxHeight: 1800,
-  );
-  if (pickedFile != null) {}
-}
-
 class _NameInput extends StatelessWidget {
   TextEditingController nameEditingParameter;
 
@@ -176,7 +218,7 @@ class _NameInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: nameEditingParameter,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: 'Name',
       ),
     );
@@ -191,8 +233,7 @@ class _MobileNumberInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: mobileNoEditingParameter,
-      //context.read<LoginBloc>().add(LoginUsernameChanged(username)),
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: 'Mobile Number',
       ),
     );
@@ -207,7 +248,7 @@ class _LandlineNumberInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: landlineEditingParameter,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: 'Landline Number',
       ),
     );
@@ -217,7 +258,7 @@ class _LandlineNumberInput extends StatelessWidget {
 class _SaveButton extends StatelessWidget {
   final VoidCallback voidCallback;
 
-  _SaveButton({required this.voidCallback});
+  const _SaveButton({required this.voidCallback});
 
   @override
   Widget build(BuildContext context) {
@@ -230,8 +271,8 @@ class _SaveButton extends StatelessWidget {
                 height: 50,
                 width: 250,
                 decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(20)),
+                    color: Colors.amber[900],
+                    borderRadius: BorderRadius.circular(10)),
                 child: TextButton(
                   onPressed: voidCallback,
                   child: const Text(

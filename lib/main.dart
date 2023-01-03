@@ -12,9 +12,12 @@ void main() async {
   DartPluginRegistrant.ensureInitialized();
 
   runApp(MaterialApp(
+      // to hide debug banner
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: Colors.lightBlue[800],
+        colorScheme: ColorScheme.fromSwatch()
+            .copyWith(primary: Colors.amber[900], error: Colors.red)
+            .copyWith(secondary: Colors.deepOrange),
       ),
       home: MyHomePage(
         title: "Contacts",

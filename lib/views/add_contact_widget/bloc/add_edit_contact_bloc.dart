@@ -1,3 +1,4 @@
+import 'package:contactsapp/bloc/contact_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,6 +13,7 @@ class AddEditContactBloc
   AddEditContactBloc()
       : super(AddEditContactState(AddEditContactStatus.initial)) {
     on<SaveContact>(_onSaveSubmitted);
+    on<updateContact>(_onUpdateSubmitted);
   }
   final _contactRepository = ContactRepository();
 
@@ -22,6 +24,25 @@ class AddEditContactBloc
     emit(state.addContact(AddEditContactStatus.loading));
     try {
       await _contactRepository.insertContact(event.contact).then((value) {
+        if (value != 0) {
+          emit(state.addContact(AddEditContactStatus.success));
+          _contactRepository.getAllContacts();
+        } else {
+          emit(state.addContact((AddEditContactStatus.error)));
+        }
+      });
+    } catch (_) {
+      emit(state.addContact((AddEditContactStatus.error)));
+    }
+  }
+
+  Future<void> _onUpdateSubmitted(
+    updateContact event,
+    Emitter<AddEditContactState> emit,
+  ) async {
+    emit(state.addContact(AddEditContactStatus.loading));
+    try {
+      await _contactRepository.updateContact(event.contact).then((value) {
         if (value != 0) {
           emit(state.addContact(AddEditContactStatus.success));
           _contactRepository.getAllContacts();

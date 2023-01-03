@@ -23,7 +23,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
   ContactBloc() : super(const ContactState()) {
     on<GetContacts>(getContacts);
     on<GetFavContacts>(getFavContacts);
-    on<UpdateContact>(updateContact);
+    on<UpdateContact>(updateContactAsFav);
   }
 
   getFavContacts(GetFavContacts event, Emitter<ContactState> emit) async {
@@ -42,8 +42,6 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
   }
 
   getContacts(GetContacts event, Emitter<ContactState> emit) async {
-    //sink is a way of adding data reactively to the stream
-    //by registering a new event
     emit(state.copyWith(status: ContactStatus.loading));
     try {
       final contacts = await _contactRepository.getAllContacts();
@@ -53,21 +51,16 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
           contacts: contacts,
         ),
       );
-    } catch (error, stacktrace) {
+    } catch (error) {
       emit(state.copyWith(status: ContactStatus.error));
     }
-    //  _contactController.sink.add(await _contactRepository.getAllContacts());
   }
-
-//  getFavContacts({String? query}) async {
-//    _contactController.sink.add(await _contactRepository.getAllFavContacts());
-//  }
 
   addContact(Contact contact) async {
     await _contactRepository.insertContact(contact);
   }
 
-  updateContact(UpdateContact event, Emitter<ContactState> emit) async {
+  updateContactAsFav(UpdateContact event, Emitter<ContactState> emit) async {
     emit(state.copyWith(status: ContactStatus.loading));
     Contact updateContact = event.contact;
     updateContact.favourite = event.contact.favourite == 1 ? 0 : 1;

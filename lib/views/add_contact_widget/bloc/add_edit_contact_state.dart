@@ -26,8 +26,6 @@ class AddEditContactState extends Equatable {
   final AddEditContactStatus status;
 
   AddEditContactState addContact(status) {
-//    var uuid = const Uuid();
-
     return AddEditContactState(status);
   }
 
