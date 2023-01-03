@@ -8,6 +8,6 @@ App should allow user to save the contact details in local database along with t
 4.	Used should use Sqflite local database for CRUD operations
 
 
-![Alt text](/screenshots/add_contact.png "Add Contact")
-![alt text](https://raw.githubusercontent.com/rajeshmadasu/ContactsApp/main/screenshots/add_contact.png)
+![Alt text](/screenshots/add_contact.png "Add Contact" =250x250)
+![alt text](https://raw.githubusercontent.com/rajeshmadasu/ContactsApp/main/screenshots/contact_list_screen.png =250x250)
 
