@@ -10,4 +10,4 @@ https://github.com/rajeshmadasu/ContactsApp.git
 
 ![alt text]((https://raw.githubusercontent.com/rajeshmadasu/ContactsApp/main/screenshots/add_contact.png)?raw=true)
 
-![alt text](https://github.com/[rajeshmadasu]/[ContactsApp]/blob/[main]/contact_list_screen.png?raw=true)
+![alt text](https://github.com/rajeshmadasu/ContactsApp/main/screenshots/contact_list_screen.png?raw=true)
