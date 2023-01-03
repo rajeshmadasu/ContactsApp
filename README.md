@@ -9,6 +9,5 @@ App should allow user to save the contact details in local database along with t
 
 
 ![Alt text](/screenshots/add_contact.png "Add Contact")
-![alt text](https://raw.githubusercontent.com/rajeshmadasu/ContactsApp/main/screenshots/add_contact.png?raw=true)
+![alt text](https://raw.githubusercontent.com/rajeshmadasu/ContactsApp/main/screenshots/add_contact.png)
 
-![alt text](https://github.com/rajeshmadasu/ContactsApp/main/screenshots/contact_list_screen.png?raw=true)
