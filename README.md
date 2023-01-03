@@ -1,17 +1,10 @@
 # contactsapp
 
-A new Flutter project.
+App should allow user to save the contact details in local database along with the photo. User can see contact list and can modify/delete any contact. Also, user can favorite/unfavorite contacts and can see list of favorite contacts
 
-## Getting Started
+1.	Used BLoC architecture
+2.	Used ‘Drawer’ for sliding drawer
+3.	Used ‘ListView’ to show contact list items
+4.	Used should use Sqflite local database for CRUD operations
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-//https://vaygeth.medium.com/reactive-flutter-todo-app-using-bloc-design-pattern-b71e2434f692
