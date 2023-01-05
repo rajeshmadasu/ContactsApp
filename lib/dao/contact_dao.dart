@@ -1,6 +1,5 @@
 import 'package:contactsapp/models/contact.dart';
 import '../database/contact_database.dart';
-import 'package:path/path.dart';
 
 class ContactDao {
   final dbProvider = DatabaseProvider.dbProvider;
@@ -61,7 +60,7 @@ class ContactDao {
 
   //Delete Todo records
   Future<int> deleteContact(int id) async {
-    final db = await dbProvider.createDatabase();
+    final db = await dbProvider.database;
     var result =
         await db.delete(contactTABLE, where: 'id = ?', whereArgs: [id]);
 
@@ -69,7 +68,7 @@ class ContactDao {
   }
 
   Future deleteAllContacts() async {
-    final db = await dbProvider.createDatabase();
+    final db = await dbProvider.database;
     var result = await db.delete(
       contactTABLE,
     );

@@ -22,7 +22,6 @@ extension AddEditContactStatusX on AddEditContactStatus {
 class AddEditContactState extends Equatable {
   AddEditContactState(this.status);
 
-  // late Contact? contact;
   final AddEditContactStatus status;
 
   AddEditContactState addContact(status) {

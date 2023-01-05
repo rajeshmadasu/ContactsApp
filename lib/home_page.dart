@@ -1,12 +1,9 @@
 import 'dart:io';
-
-import 'package:contactsapp/models/contact.dart';
-
-import './database/contact_database.dart';
-import './views/add_contact_widget/add_contact.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import './database/contact_database.dart';
+import './views/add_contact_widget/add_contact.dart';
 import 'bloc/contact_bloc.dart';
 import 'views/error_widget.dart';
 
@@ -191,74 +188,94 @@ class _ContactListState extends State<ContactList> {
       BlocBuilder<ContactBloc, ContactState>(builder: (context, state) {
         return state.status.isSuccess
             ? state.contacts.isEmpty
-                ? Center(child: Text("No Contacts found"))
+                ? const Center(child: Text("No Contacts found"))
                 : ListView.builder(
                     itemBuilder: (context, index) {
                       state.contacts.sort((a, b) => a.name.compareTo(b.name));
                       return Card(
                         elevation: 5,
-                        child: ListTile(
-                            leading: state.contacts[index].image.isNotEmpty
-                                ? CircleAvatar(
-                                    radius: 26,
-                                    backgroundColor: Colors.white,
-                                    child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(60.0),
-                                        child: Image.file(
+                        child: Dismissible(
+                          key: ValueKey(state.contacts[index].id),
+                          background: Container(
+                            color: Colors.red,
+                            // ignore: sort_child_properties_last
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 4),
+                            alignment: Alignment.centerRight,
+                          ),
+                          direction: DismissDirection.endToStart,
+                          onDismissed: (direction) {
+                            context.read<ContactBloc>().add((DeleteContact(
+                                contactId: state.contacts[index].id)));
+                          },
+                          child: ListTile(
+                              leading: state.contacts[index].image.isNotEmpty
+                                  ? CircleAvatar(
+                                      radius: 26,
+                                      backgroundColor: Colors.white,
+                                      child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(60.0),
+                                          child: Image.file(
+                                              width: 60,
+                                              height: 60,
+                                              fit: BoxFit.cover,
+                                              File(state.contacts[index].image
+                                                  .toString()))))
+                                  : CircleAvatar(
+                                      radius: 26,
+                                      backgroundColor: Colors.white,
+                                      child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(60.0),
+                                          child: Image.asset(
+                                            'assets/images/add_image.png',
                                             width: 60,
                                             height: 60,
-                                            fit: BoxFit.cover,
-                                            File(state.contacts[index].image
-                                                .toString()))))
-                                : CircleAvatar(
-                                    radius: 26,
-                                    backgroundColor: Colors.white,
-                                    child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(60.0),
-                                        child: Image.asset(
-                                          'assets/images/add_image.png',
-                                          width: 60,
-                                          height: 60,
-                                        ))),
-                            title: Text(
-                              state.contacts[index].name.toString(),
-                              style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                              '${state.contacts[index].mobileNumber}\n${state.contacts[index].landlineNumber}',
-                            ),
-                            isThreeLine: true,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AddContactPage(
-                                          contact: state.contacts[index],
-                                          title: 'Update Contact',
-                                        )),
-                              ).then((value) => {refreshPage(value)});
-                            },
-                            trailing: GestureDetector(
-                                onTap: (() {
-                                  context.read<ContactBloc>().add(
-                                      (UpdateContact(
-                                          contact: state.contacts[index])));
+                                          ))),
+                              title: Text(
+                                state.contacts[index].name.toString(),
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                '${state.contacts[index].mobileNumber}\n${state.contacts[index].landlineNumber}',
+                              ),
+                              isThreeLine: true,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AddContactPage(
+                                            contact: state.contacts[index],
+                                            title: 'Update Contact',
+                                          )),
+                                ).then((value) => {refreshPage(value)});
+                              },
+                              trailing: GestureDetector(
+                                  onTap: (() {
+                                    context.read<ContactBloc>().add(
+                                        (UpdateContact(
+                                            contact: state.contacts[index])));
 
-                                  //  updateFav(state.contacts![index]);
-                                }),
-                                child: state.contacts[index].favourite == 1
-                                    ? const Icon(
-                                        Icons.star,
-                                        color: Colors.red,
-                                      )
-                                    : const Icon(
-                                        Icons.star,
-                                      ))),
+                                    //  updateFav(state.contacts![index]);
+                                  }),
+                                  child: state.contacts[index].favourite == 1
+                                      ? const Icon(
+                                          Icons.star,
+                                          color: Colors.red,
+                                        )
+                                      : const Icon(
+                                          Icons.star,
+                                        ))),
+                        ),
                       );
                     },
                     itemCount: state.contacts.length,
