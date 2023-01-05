@@ -24,6 +24,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     on<GetContacts>(getContacts);
     on<GetFavContacts>(getFavContacts);
     on<UpdateContact>(updateContactAsFav);
+    on<DeleteContact>(deleteContactById);
   }
 
   getFavContacts(GetFavContacts event, Emitter<ContactState> emit) async {
@@ -79,8 +80,26 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     }
   }
 
-  deleteContactById(int id) async {
-    _contactRepository.deleteContactById(id);
+  deleteContactById(DeleteContact event, Emitter<ContactState> emit) async {
+    emit(state.copyWith(status: ContactStatus.loading));
+
+    final response =
+        await _contactRepository.deleteContactById(event.contactId);
+    try {
+      if (response == 1) {
+        final contacts = await _contactRepository.getAllContacts();
+        emit(
+          state.copyWith(
+            status: ContactStatus.success,
+            contacts: contacts,
+          ),
+        );
+      } else {
+        emit(state.copyWith(status: ContactStatus.error));
+      }
+    } catch (error) {
+      emit(state.copyWith(status: ContactStatus.error));
+    }
   }
 
   dispose() {

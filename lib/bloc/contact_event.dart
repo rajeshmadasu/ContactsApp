@@ -9,6 +9,13 @@ class GetContacts extends ContactEvent {}
 
 class GetFavContacts extends ContactEvent {}
 
+class DeleteContact extends ContactEvent {
+  int contactId;
+  DeleteContact({required this.contactId});
+  @override
+  List<Object> get props => [contactId];
+}
+
 class UpdateContact extends ContactEvent {
   Contact contact;
   UpdateContact({required this.contact});
