@@ -2,9 +2,6 @@
 
 import 'dart:io';
 
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/tap_bounce_container.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:flutter/material.dart';
 import '../../models/contact.dart';
 import '../add_contact_widget/bloc/add_edit_contact_bloc.dart';
@@ -40,7 +37,7 @@ class _AddContactViewState extends State<AddContactView> {
         mobileNumber.text.isNotEmpty &&
         landlineNumber.text.isNotEmpty) {
       context.read<AddEditContactBloc>().add(editContact
-          ? updateContact(Contact(
+          ? UpdateContact(Contact(
               id: contactId,
               name: name.text.toString(),
               mobileNumber: mobileNumber.text.toString(),
@@ -72,6 +69,14 @@ class _AddContactViewState extends State<AddContactView> {
         contactId = contact.id;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    name.dispose();
+    mobileNumber.dispose();
+    landlineNumber.dispose();
   }
 
   @override
@@ -233,6 +238,7 @@ class _MobileNumberInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: mobileNoEditingParameter,
+      keyboardType: TextInputType.phone,
       decoration: const InputDecoration(
         labelText: 'Mobile Number',
       ),
@@ -248,6 +254,7 @@ class _LandlineNumberInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: landlineEditingParameter,
+      keyboardType: TextInputType.phone,
       decoration: const InputDecoration(
         labelText: 'Landline Number',
       ),

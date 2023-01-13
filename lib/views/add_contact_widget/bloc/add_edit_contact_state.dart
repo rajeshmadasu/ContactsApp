@@ -20,11 +20,11 @@ extension AddEditContactStatusX on AddEditContactStatus {
 }
 
 class AddEditContactState extends Equatable {
-  AddEditContactState(this.status);
+  const AddEditContactState(this.status);
 
   final AddEditContactStatus status;
 
-  AddEditContactState addContact(status) {
+  AddEditContactState addEditContactStatus(status) {
     return AddEditContactState(status);
   }
 

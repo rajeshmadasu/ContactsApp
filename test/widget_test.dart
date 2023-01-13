@@ -7,8 +7,8 @@
 
 // ignore_for_file: import_of_legacy_library_into_null_safe
 
-import 'package:contactsapp/database/contact_database.dart';
-import 'package:contactsapp/home_page.dart';
+import 'package:contactsapp/repository/contact_repository.dart';
+import 'package:contactsapp/views/screens/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -17,7 +17,7 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(MyHomePage(
       title: 'a',
-      databaseProvider: DatabaseProvider(),
+      contactRepository: ContactRepository(),
     ));
 
     // Verify that our counter starts at 0.

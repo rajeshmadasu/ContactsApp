@@ -6,8 +6,6 @@ App should allow user to save the contact details in local database along with t
 2.	Used ‘Drawer’ for sliding drawer
 3.	Used ‘ListView’ to show contact list items
 4.	Used should use Sqflite local database for CRUD operations
-![Alt text](/screenshots/add_contact.png "Add Contact")
-https://raw.githubusercontent.com/rajeshmadasu/ContactsApp/main/screenshots/add_contact.png
-![alt text](https://github.com/[rajeshmadasu]/[ContactsApp/main/add_contact.png?raw=true)
 
-![alt text](https://github.com/[rajeshmadasu]/[ContactsApp//main/contact_list_screen.png?raw=true)
+<img src="https://raw.githubusercontent.com/rajeshmadasu/ContactsApp/main/screenshots/contact_list_screen.png"  width="120" height="200" />
+<img src="https://raw.githubusercontent.com/rajeshmadasu/ContactsApp/main/screenshots/add_contact.png"  width="120" height="200" />

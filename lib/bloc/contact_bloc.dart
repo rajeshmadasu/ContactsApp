@@ -10,7 +10,7 @@ part 'contact_state.dart';
 
 class ContactBloc extends Bloc<ContactEvent, ContactState> {
   //Get instance of the Repository
-  final _contactRepository = ContactRepository();
+  final ContactRepository contactRepository;
 
   //Stream controller is the 'Admin' that manages
   //the state of our stream of data like adding
@@ -20,7 +20,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
 
   get allContacts => _contactController.stream;
 
-  ContactBloc() : super(const ContactState()) {
+  ContactBloc({required this.contactRepository}) : super(ContactState()) {
     on<GetContacts>(getContacts);
     on<GetFavContacts>(getFavContacts);
     on<UpdateContact>(updateContactAsFav);
@@ -30,7 +30,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
   getFavContacts(GetFavContacts event, Emitter<ContactState> emit) async {
     emit(state.copyWith(status: ContactStatus.loading));
     try {
-      final contacts = await _contactRepository.getAllFavContacts();
+      final contacts = await contactRepository.getAllFavContacts();
       emit(
         state.copyWith(
           status: ContactStatus.success,
@@ -45,7 +45,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
   getContacts(GetContacts event, Emitter<ContactState> emit) async {
     emit(state.copyWith(status: ContactStatus.loading));
     try {
-      final contacts = await _contactRepository.getAllContacts();
+      final contacts = await contactRepository.getAllContacts();
       emit(
         state.copyWith(
           status: ContactStatus.success,
@@ -58,17 +58,17 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
   }
 
   addContact(Contact contact) async {
-    await _contactRepository.insertContact(contact);
+    await contactRepository.insertContact(contact);
   }
 
   updateContactAsFav(UpdateContact event, Emitter<ContactState> emit) async {
     emit(state.copyWith(status: ContactStatus.loading));
     Contact updateContact = event.contact;
     updateContact.favourite = event.contact.favourite == 1 ? 0 : 1;
-    await _contactRepository.updateContact(updateContact);
+    await contactRepository.updateContact(updateContact);
 
     try {
-      final contacts = await _contactRepository.getAllContacts();
+      final contacts = await contactRepository.getAllContacts();
       emit(
         state.copyWith(
           status: ContactStatus.success,
@@ -83,11 +83,10 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
   deleteContactById(DeleteContact event, Emitter<ContactState> emit) async {
     emit(state.copyWith(status: ContactStatus.loading));
 
-    final response =
-        await _contactRepository.deleteContactById(event.contactId);
+    final response = await contactRepository.deleteContactById(event.contactId);
     try {
       if (response == 1) {
-        final contacts = await _contactRepository.getAllContacts();
+        final contacts = await contactRepository.getAllContacts();
         emit(
           state.copyWith(
             status: ContactStatus.success,

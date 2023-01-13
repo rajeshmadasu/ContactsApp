@@ -1,11 +1,9 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
-
 import 'dart:ui';
 
-import 'package:contactsapp/database/contact_database.dart';
+import 'package:contactsapp/repository/contact_repository.dart';
 import 'package:flutter/material.dart';
 
-import 'home_page.dart';
+import 'views/screens/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +18,6 @@ void main() async {
             .copyWith(secondary: Colors.deepOrange),
       ),
       home: MyHomePage(
-        title: "Contacts",
-        databaseProvider: DatabaseProvider(),
+        contactRepository: ContactRepository(),
       )));
 }

@@ -2,28 +2,28 @@ import 'package:contactsapp/models/contact.dart';
 import 'package:contactsapp/views/add_contact_widget/bloc/add_edit_contact_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../add_contact_widget/add_contact_view.dart';
+import '../widgets/add_contact_view.dart';
 import 'package:flutter/material.dart';
 
-class AddContactPage extends StatefulWidget {
+class AddEditContactPage extends StatefulWidget {
   final Contact? contact;
   final String title;
-  const AddContactPage({
+  const AddEditContactPage({
     super.key,
     required this.contact,
     required this.title,
   });
 
   @override
-  State<AddContactPage> createState() => _AddContactPageState();
+  State<AddEditContactPage> createState() => _AddEditContactPageState();
 }
 
-class _AddContactPageState extends State<AddContactPage> {
-  bool isFavEnabled = false;
+class _AddEditContactPageState extends State<AddEditContactPage> {
+  bool isFavoriteSelected = false;
 
-  void updateFav(bool value) {
+  void updateFav() {
     setState(() {
-      isFavEnabled = value;
+      isFavoriteSelected = !isFavoriteSelected;
     });
   }
 
@@ -32,8 +32,8 @@ class _AddContactPageState extends State<AddContactPage> {
     super.initState();
     if (widget.contact != null) {
       widget.contact!.favourite == 1
-          ? isFavEnabled = true
-          : isFavEnabled = false;
+          ? isFavoriteSelected = true
+          : isFavoriteSelected = false;
     }
   }
 
@@ -44,15 +44,13 @@ class _AddContactPageState extends State<AddContactPage> {
         title: Text(widget.title),
         actions: [
           IconButton(
-            icon: isFavEnabled
+            icon: isFavoriteSelected
                 ? Icon(Icons.star, color: Colors.green[900])
                 : const Icon(
                     Icons.star,
                     color: Colors.white,
                   ),
-            onPressed: () {
-              updateFav(!isFavEnabled);
-            },
+            onPressed: updateFav,
           )
         ],
       ),
@@ -62,7 +60,7 @@ class _AddContactPageState extends State<AddContactPage> {
           create: (context) {
             return AddEditContactBloc();
           },
-          child: AddContactView(widget.contact, isFavEnabled),
+          child: AddContactView(widget.contact, isFavoriteSelected),
         ),
       ),
     );

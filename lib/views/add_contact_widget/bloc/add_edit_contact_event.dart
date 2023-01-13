@@ -7,10 +7,10 @@ abstract class AddEditContactEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class updateContact extends AddEditContactEvent {
+class UpdateContact extends AddEditContactEvent {
   Contact contact;
 
-  updateContact(this.contact);
+  UpdateContact(this.contact);
 
   @override
   List<Object> get props => [contact];

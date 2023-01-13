@@ -1,4 +1,3 @@
-import 'package:contactsapp/bloc/contact_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -11,9 +10,9 @@ part 'add_edit_contact_state.dart';
 class AddEditContactBloc
     extends Bloc<AddEditContactEvent, AddEditContactState> {
   AddEditContactBloc()
-      : super(AddEditContactState(AddEditContactStatus.initial)) {
+      : super(const AddEditContactState(AddEditContactStatus.initial)) {
     on<SaveContact>(_onSaveSubmitted);
-    on<updateContact>(_onUpdateSubmitted);
+    on<UpdateContact>(_onUpdateSubmitted);
   }
   final _contactRepository = ContactRepository();
 
@@ -21,37 +20,35 @@ class AddEditContactBloc
     SaveContact event,
     Emitter<AddEditContactState> emit,
   ) async {
-    emit(state.addContact(AddEditContactStatus.loading));
+    emit(state.addEditContactStatus(AddEditContactStatus.loading));
     try {
       await _contactRepository.insertContact(event.contact).then((value) {
         if (value != 0) {
-          emit(state.addContact(AddEditContactStatus.success));
-          _contactRepository.getAllContacts();
+          emit(state.addEditContactStatus(AddEditContactStatus.success));
         } else {
-          emit(state.addContact((AddEditContactStatus.error)));
+          emit(state.addEditContactStatus((AddEditContactStatus.error)));
         }
       });
     } catch (_) {
-      emit(state.addContact((AddEditContactStatus.error)));
+      emit(state.addEditContactStatus((AddEditContactStatus.error)));
     }
   }
 
   Future<void> _onUpdateSubmitted(
-    updateContact event,
+    UpdateContact event,
     Emitter<AddEditContactState> emit,
   ) async {
-    emit(state.addContact(AddEditContactStatus.loading));
+    emit(state.addEditContactStatus(AddEditContactStatus.loading));
     try {
       await _contactRepository.updateContact(event.contact).then((value) {
         if (value != 0) {
-          emit(state.addContact(AddEditContactStatus.success));
-          _contactRepository.getAllContacts();
+          emit(state.addEditContactStatus(AddEditContactStatus.success));
         } else {
-          emit(state.addContact((AddEditContactStatus.error)));
+          emit(state.addEditContactStatus((AddEditContactStatus.error)));
         }
       });
     } catch (_) {
-      emit(state.addContact((AddEditContactStatus.error)));
+      emit(state.addEditContactStatus((AddEditContactStatus.error)));
     }
   }
 }
